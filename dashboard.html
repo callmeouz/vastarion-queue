@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vastarion Queue</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0E0F13;
+            color: #C9CDD6;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            min-height: 100vh;
+        }
+
+        /* ═══ HEADER ═══ */
+        .header {
+            background: #151821;
+            border-bottom: 1px solid #262B38;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #F0F2F5;
+            letter-spacing: 0.5px;
+        }
+
+        .header h1 span {
+            color: #7C3AED;
+        }
+
+        .status-badge {
+            background: #151821;
+            border: 1px solid #262B38;
+            padding: 7px 18px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3FB950;
+            box-shadow: 0 0 8px rgba(63, 185, 80, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #F85149;
+            box-shadow: 0 0 8px rgba(248, 81, 73, 0.5);
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ═══ METRICS GRID ═══ */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 28px 40px 0;
+        }
+
+        .metric-card {
+            background: #1B1F2A;
+            border: 1px solid #262B38;
+            border-radius: 14px;
+            padding: 22px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7C3AED, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: rgba(124, 58, 237, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: #6B7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #F0F2F5;
+            line-height: 1;
+        }
+
+        .metric-card.accent .metric-value {
+            color: #7C3AED;
+        }
+
+        /* ═══ SECTIONS ═══ */
+        .section {
+            padding: 28px 40px 0;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #F0F2F5;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: #7C3AED;
+            border-radius: 2px;
+        }
+
+        /* ═══ CAMPAIGN FORM ═══ */
+        .campaign-form {
+            background: #1B1F2A;
+            border: 1px solid #262B38;
+            border-radius: 14px;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.78rem;
+            color: #6B7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: #151821;
+            border: 1px solid #262B38;
+            color: #E0E0E0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #7C3AED;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #3D4250;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .btn-launch {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #7C3AED, #6D28D9);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .btn-launch:active {
+            transform: translateY(0);
+        }
+
+        /* ═══ PROGRESS ═══ */
+        .progress-container {
+            background: #1B1F2A;
+            border: 1px solid #262B38;
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-top: 4px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .progress-campaign-name {
+            font-weight: 600;
+            color: #F0F2F5;
+            font-size: 0.92rem;
+        }
+
+        .progress-percent {
+            font-weight: 600;
+            color: #7C3AED;
+            font-size: 0.92rem;
+        }
+
+        .progress-bar {
+            background: #262B38;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #7C3AED, #8B5CF6);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .progress-detail {
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+
+        /* ═══ WORKERS ═══ */
+        .worker-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .worker-card {
+            background: #1B1F2A;
+            border: 1px solid #262B38;
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.25s ease;
+        }
+
+        .worker-card:hover {
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .worker-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .worker-dot {
+            width: 9px;
+            height: 9px;
+            background: #3FB950;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(63, 185, 80, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .worker-name {
+            font-weight: 500;
+            color: #E0E0E0;
+            font-size: 0.88rem;
+        }
+
+        .worker-heartbeat {
+            color: #4B5063;
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+        }
+
+        /* ═══ LIVE LOG ═══ */
+        .log-box {
+            background: #151821;
+            border: 1px solid #262B38;
+            border-radius: 12px;
+            padding: 18px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+        }
+
+        .log-box::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .log-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-box::-webkit-scrollbar-thumb {
+            background: #262B38;
+            border-radius: 10px;
+        }
+
+        .log-entry {
+            padding: 2px 0;
+        }
+
+        .log-time {
+            color: #4B5063;
+        }
+
+        .log-success {
+            color: #3FB950;
+        }
+
+        .log-error {
+            color: #F85149;
+        }
+
+        .log-info {
+            color: #7C3AED;
+        }
+
+        /* ═══ ACTIONS BAR ═══ */
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-action {
+            background: #1B1F2A;
+            border: 1px solid #262B38;
+            color: #C9CDD6;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-action:hover {
+            border-color: #7C3AED;
+            color: #7C3AED;
+        }
+
+        .btn-action.danger:hover {
+            border-color: #F85149;
+            color: #F85149;
+        }
+
+        /* ═══ EMPTY STATE ═══ */
+        .empty-state {
+            text-align: center;
+            padding: 32px;
+            color: #4B5063;
+            font-size: 0.85rem;
+        }
+
+        /* ═══ FOOTER ═══ */
+        .footer {
+            padding: 28px 40px;
+            text-align: center;
+            color: #3D4250;
+            font-size: 0.75rem;
+            letter-spacing: 0.4px;
+        }
+
+        .footer a {
+            color: #7C3AED;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img src="assets/favicon.png" alt="VQ" style="height:38px; width:auto;">
+            <h1><span>Vastarion</span> Queue</h1>
+        </div>
+        <div class="status-badge" id="connectionStatus">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Connecting...</span>
+        </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Queue Size</div>
+            <div class="metric-value" id="queueSize">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Priority Queue</div>
+            <div class="metric-value" id="prioritySize">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Dead Letter</div>
+            <div class="metric-value" id="deadLetterSize">0</div>
+        </div>
+        <div class="metric-card accent">
+            <div class="metric-label">Workers Online</div>
+            <div class="metric-value" id="workersOnline">0</div>
+        </div>
+    </div>
+
+    <!-- CAMPAIGN FORM -->
+    <div class="section">
+        <div class="section-title">Start Email Campaign</div>
+        <div class="campaign-form">
+            <div class="form-group">
+                <label>Campaign Name</label>
+                <input type="text" id="campaignName" placeholder="Enter campaign name">
+            </div>
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" id="campaignSubject" placeholder="Enter email subject">
+            </div>
+            <div class="form-group full-width">
+                <label>Recipients</label>
+                <input type="text" id="emailList" placeholder="john.doe@example.com, jane.smith@example.com">
+            </div>
+            <div class="form-group full-width">
+                <label>Message Body</label>
+                <textarea id="emailBody" rows="3" placeholder="Write your email content here..."></textarea>
+            </div>
+            <button class="btn-launch" onclick="startCampaign()">Launch Campaign</button>
+        </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="section">
+        <div class="section-title">Campaign Progress</div>
+        <div class="progress-container" id="progressContainer" style="display:none;">
+            <div class="progress-header">
+                <span class="progress-campaign-name" id="campaignLabel">—</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-detail" id="progressDetail">0 / 0 emails sent</span>
+        </div>
+        <div class="empty-state" id="noProgress">No active campaign</div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="section">
+        <div class="section-title">Actions</div>
+        <div class="actions-bar">
+            <button class="btn-action" onclick="refreshStatus()">Refresh Status</button>
+            <button class="btn-action danger" onclick="clearQueues()">Clear All Queues</button>
+        </div>
+    </div>
+
+    <!-- WORKERS -->
+    <div class="section">
+        <div class="section-title">Workers</div>
+        <div class="worker-grid" id="workerGrid">
+            <div class="empty-state">No workers online</div>
+        </div>
+    </div>
+
+    <!-- LIVE LOG -->
+    <div class="section">
+        <div class="section-title">Live Log</div>
+        <div class="log-box" id="logBox"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Built by <a href="https://github.com/callmeouz" target="_blank">Oğuzhan Yılmaz</a> — Vastarion Queue v1.0
+    </div>
+
+    <script>
+        let currentCampaignId = null;
+
+        // ═══ WEBSOCKET ═══
+        const ws = new WebSocket("ws://127.0.0.1:8000/ws/tasks");
+
+        ws.onopen = function () {
+            document.getElementById("statusDot").classList.remove("disconnected");
+            document.getElementById("statusText").textContent = "Connected";
+            addLog("Connected to server", "info");
+        };
+
+        ws.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            document.getElementById("queueSize").textContent = data.queue_size;
+            document.getElementById("prioritySize").textContent = data.priority_queue_size;
+            document.getElementById("deadLetterSize").textContent = data.dead_letter_size;
+            document.getElementById("workersOnline").textContent = data.workers_online || 0;
+
+            if (data.workers && data.workers.length > 0) {
+                updateWorkers(data.workers);
+            } else {
+                document.getElementById("workerGrid").innerHTML =
+                    '<div class="empty-state">No workers online</div>';
+            }
+        };
+
+        ws.onclose = function () {
+            document.getElementById("statusDot").classList.add("disconnected");
+            document.getElementById("statusText").textContent = "Disconnected";
+            addLog("Disconnected from server", "error");
+        };
+
+        // ═══ CAMPAIGN ═══
+        async function startCampaign() {
+            const name = document.getElementById("campaignName").value;
+            const subject = document.getElementById("campaignSubject").value;
+            const emails = document.getElementById("emailList").value.split(",").map(e => e.trim()).filter(e => e);
+            const body = document.getElementById("emailBody").value;
+
+            if (!name || !subject || !emails.length || !body) {
+                addLog("Please fill in all fields", "error");
+                return;
+            }
+
+            const response = await fetch("http://127.0.0.1:8000/campaign/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    campaign_name: name,
+                    emails: emails,
+                    subject: subject,
+                    body: body
+                })
+            });
+
+            const data = await response.json();
+            currentCampaignId = data.campaign_id;
+            addLog(`Campaign launched: ${name} — ${data.total_emails} recipients`, "success");
+
+            document.getElementById("progressContainer").style.display = "block";
+            document.getElementById("noProgress").style.display = "none";
+            document.getElementById("campaignLabel").textContent = `${name} (${currentCampaignId})`;
+
+            pollProgress();
+        }
+
+        // ═══ PROGRESS POLLING ═══
+        async function pollProgress() {
+            if (!currentCampaignId) return;
+
+            const response = await fetch(`http://127.0.0.1:8000/campaign/${currentCampaignId}/progress`);
+            const data = await response.json();
+
+            const percent = data.total > 0 ? (data.sent / data.total * 100) : 0;
+            document.getElementById("progressFill").style.width = percent + "%";
+            document.getElementById("progressPercent").textContent = percent.toFixed(1) + "%";
+            document.getElementById("progressDetail").textContent = `${data.sent} / ${data.total} emails sent`;
+
+            if (data.sent < data.total) {
+                setTimeout(pollProgress, 800);
+            } else {
+                addLog(`Campaign complete — ${data.total} emails delivered`, "success");
+            }
+        }
+
+        // ═══ ACTIONS ═══
+        async function clearQueues() {
+            await fetch("http://127.0.0.1:8000/tasks/clear", { method: "DELETE" });
+            addLog("All queues cleared", "info");
+        }
+
+        async function refreshStatus() {
+            const response = await fetch("http://127.0.0.1:8000/tasks/status");
+            const data = await response.json();
+            addLog(`Status — Queue: ${data.queue_size}, Priority: ${data.priority_queue_size}`, "info");
+        }
+
+        // ═══ WORKERS ═══
+        function updateWorkers(workers) {
+            const grid = document.getElementById("workerGrid");
+            grid.innerHTML = "";
+            workers.forEach(w => {
+                const card = document.createElement("div");
+                card.className = "worker-card";
+                card.innerHTML = `
+                    <div class="worker-info">
+                        <div class="worker-dot"></div>
+                        <span class="worker-name">${w.name}</span>
+                    </div>
+                    <span class="worker-heartbeat">${w.last_heartbeat}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ═══ LOGGING ═══
+        function addLog(message, type) {
+            const box = document.getElementById("logBox");
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement("div");
+            entry.className = "log-entry";
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+            box.appendChild(entry);
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
