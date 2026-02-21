@@ -1,6 +1,16 @@
+import logging
 import multiprocessing
 import time
+
 from workers.worker import Worker
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
+    datefmt="%H:%M:%S"
+)
+
+logger = logging.getLogger(__name__)
 
 
 def run_worker():
@@ -14,14 +24,14 @@ if __name__ == "__main__":
         p = multiprocessing.Process(target=run_worker)
         p.start()
         workers.append(p)
-        print(f"Worker-{i+1} started")
+        logger.info("Worker-%d started", i + 1)
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\nStopping workers...")
+        logger.info("Stopping workers...")
         for p in workers:
             p.terminate()
             p.join()
-        print("All workers stopped.")
+        logger.info("All workers stopped.")

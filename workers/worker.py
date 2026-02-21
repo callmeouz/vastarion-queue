@@ -1,8 +1,13 @@
-import time
-import signal
 import datetime
+import logging
 import multiprocessing
+import signal
+import time
+
 from core.queue import TaskQueue
+
+logger = logging.getLogger(__name__)
+
 
 class Worker:
     def __init__(self, queue_name="task_queue"):
@@ -11,18 +16,23 @@ class Worker:
 
     def process_task(self, task_data: dict):
         self.heartbeat()
-        print(f"[Worker {multiprocessing.current_process().name}] Sending email to: {task_data.get('to')}")
+        logger.info("[%s] Sending email to: %s",
+                     multiprocessing.current_process().name,
+                     task_data.get('to'))
         time.sleep(1)
-        
+
         campaign_id = task_data.get("campaign_id")
         if campaign_id:
             self.queue.redis.incr(f"campaign:{campaign_id}:sent")
 
-        print(f"[Worker {multiprocessing.current_process().name}] Done: {task_data.get('to')}")
+        logger.info("[%s] Done: %s",
+                     multiprocessing.current_process().name,
+                     task_data.get('to'))
 
     def start(self):
         signal.signal(signal.SIGTERM, lambda sig, frame: self.stop())
-        print(f"[Worker {multiprocessing.current_process().name}] Started. Waiting for tasks...")
+        logger.info("[%s] Started. Waiting for tasks...",
+                     multiprocessing.current_process().name)
         while self.running:
             self.heartbeat()
             task = self.queue.dequeue()
@@ -30,10 +40,12 @@ class Worker:
                 self.process_task(task)
             else:
                 time.sleep(0.5)
-        print(f"[Worker {multiprocessing.current_process().name}] Shut down complete.")
+        logger.info("[%s] Shut down complete.",
+                     multiprocessing.current_process().name)
 
     def stop(self):
-        print(f"[Worker {multiprocessing.current_process().name}] Stopping gracefully...")
+        logger.info("[%s] Stopping gracefully...",
+                     multiprocessing.current_process().name)
         self.running = False
 
     def heartbeat(self):

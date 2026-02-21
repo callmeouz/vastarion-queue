@@ -1,6 +1,11 @@
 import json
-import redis
+import logging
 import time
+
+import redis
+
+logger = logging.getLogger(__name__)
+
 
 class RetryableTask:
     def __init__(self, max_retries=3, base_delay=2):
@@ -12,16 +17,20 @@ class RetryableTask:
         for attempt in range(self.max_retries):
             try:
                 result = task_function(task_data)
-                print(f"Success! Attempt: {attempt + 1}")
+                logger.info("Task succeeded on attempt %d", attempt + 1)
                 return result
             except Exception as e:
                 wait_time = self.base_delay ** (attempt + 1)
-                print(f"Error: {e}. Attempt {attempt + 1}/{self.max_retries}. Waiting {wait_time}s...")
+                logger.warning(
+                    "Attempt %d/%d failed: %s. Retrying in %ds...",
+                    attempt + 1, self.max_retries, e, wait_time
+                )
                 time.sleep(wait_time)
 
-        print(f"Task failed! Sending to dead letter queue.")
+        logger.error("Task failed after %d attempts. Sending to DLQ.", self.max_retries)
         self.dead_letter_queue.enqueue(task_data)
         return None
+
 
 class TaskQueue:
     def __init__(self, queue_name="task_queue"):
@@ -40,7 +49,8 @@ class TaskQueue:
 
     def size(self):
         return self.redis.llen(self.queue_name)
-    
+
+
 class PriorityQueue:
     def __init__(self, queue_name="priority_queue"):
         self.redis = redis.Redis(host='localhost', port=6379, db=0)

@@ -66,6 +66,9 @@ python main.py
 Open `http://127.0.0.1:8000` for the dashboard.
 
 ### Tests
+
+Coverage: FIFO queue, priority scheduling, retry logic with exponential backoff, dead-letter queue routing, worker heartbeat, graceful shutdown.
+
 ```bash
 pytest tests/ -v
 ```
