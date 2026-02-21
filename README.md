@@ -40,18 +40,22 @@ Instead of relying on Celery, the goal was to reimplement core mechanics manuall
 
 ### Prerequisites
 
-- Python 3.11+
 - Docker Desktop
 
-### Installation
+### Run with Docker (Recommended)
+```bash
+docker-compose up --build
+```
+Open `http://localhost:8000` for the dashboard.
+
+### Run Manually
+
 ```bash
 docker run -d --name redis-queue -p 6379:6379 redis
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 ```
-
-### Run
 
 **Terminal 1 — API:**
 ```bash

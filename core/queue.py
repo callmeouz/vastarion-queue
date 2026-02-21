@@ -1,10 +1,13 @@
 import json
 import logging
+import os
 import time
 
 import redis
 
 logger = logging.getLogger(__name__)
+
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 
 
 class RetryableTask:
@@ -34,7 +37,7 @@ class RetryableTask:
 
 class TaskQueue:
     def __init__(self, queue_name="task_queue"):
-        self.redis = redis.Redis(host='localhost', port=6379, db=0)
+        self.redis = redis.Redis(host=REDIS_HOST, port=6379, db=0)
         self.queue_name = queue_name
 
     def enqueue(self, task_data: dict):
